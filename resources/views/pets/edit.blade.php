@@ -40,7 +40,6 @@
                     <div class="form-group mb-3">
                         <label for="image">Завантажити фотографію:</label>
                         <input type="file" name="image" id="image" class="form-control-file"  onchange="previewImage()">
-                        <img id="imagePreview" src="{{ asset('storage/' . $pet->image_path) }}" alt="Preview" class="mt-2" style="max-width: 100%">
                     </div>
 
                     <button type="submit" class="btn btn-success mb-3">Оновити компаньйона</button>

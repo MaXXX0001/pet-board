@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
-use Illuminate\Http\Request;
+use App\Http\Requests\PetRequest;
 use App\Models\Pet;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class PetController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         $user = auth()->user();
 
@@ -25,104 +28,109 @@ class PetController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new pet.
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         return view('pets.create');
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param PetRequest $request
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(PetRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'breed' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
         $pet = Pet::create([
             'name' => $request->input('name'),
             'breed' => $request->input('breed'),
             'description' => $request->input('description'),
-            'image_path' => $request->file('image')->store('images', 'public'),
             'author_id' => auth()->id(),
         ]);
+
+        $pet->updateImage($request->file('image'));
 
         return redirect()->route('home')->with('success', 'Ви успішно додали свого компаньйона, очікуйте підтвердження!');
     }
 
-
     /**
      * Display the specified resource.
+     *
+     * @param Pet $pet
+     * @return View
      */
-    public function show(string $id, Pet $pet)
+    public function show(Pet $pet): View
     {
         $comments = $pet->comments;
-        $pet = Pet::with('owner')->findOrFail($id);
-
+        $pet = $pet->load('owner');
 
         return view('pets.show', compact('pet', 'comments'));
     }
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * @param Pet $pet
+     * @return View
      */
-    public function edit(string $id)
+    public function edit(Pet $pet): View
     {
-        $pet = Pet::findOrFail($id);
         return view('pets.edit', compact('pet'));
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param PetRequest $request
+     * @param Pet $pet
+     * @return RedirectResponse
      */
-    public function update(Request $request, string $id)
+    public function update(PetRequest $request, Pet $pet): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'breed' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
-        ]);
-
-        $pet = Pet::findOrFail($id);
-
         $pet->update([
             'name' => $request->input('name'),
             'breed' => $request->input('breed'),
             'description' => $request->input('description'),
-            'image_path' => $request->hasFile('image') ? $request->file('image')->store('images', 'public') : $pet->image_path,
+            'image_path' => $request->file('image')->store('', 'public'),
         ]);
+
+        $pet->updateImage($request->file('image'));
 
         return redirect()->route('home')->with('success', 'Ви успішно відредагували свого компаньйона!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Destroy the specified resource.
+     *
+     * @param Pet $pet The pet entity to be deleted
+     * @return RedirectResponse
      */
-    public function destroy(Pet $pet, $id)
+    public function destroy(Pet $pet): RedirectResponse
     {
         $user = auth()->user();
-        $pet = Pet::findOrFail($id);
 
         if ($user->isAdmin() || $user->id === $pet->author_id) {
             $pet->delete();
-            return redirect()->route('home')->with('success', 'Компаньйона видалено успішно.');
+            return redirect()->route('home')->with('success', 'Компаньйона видалено успішно!');
         }
 
-        return redirect()->route('home')->with('error', 'У вас немає прав для видалення цього компаньйона.');
+        return redirect()->route('home')->with('error', 'У вас немає прав для видалення цього компаньйона!');
     }
 
-
-    public function approve(Request $request, $id)
+    /**
+     * Approve a pet.
+     *
+     * @param Pet $pet The pet to be approved.
+     * @return RedirectResponse
+     */
+    public function approve(Pet $pet): RedirectResponse
     {
-        $pet = Pet::findOrFail($id);
         $pet->update(['status' => 'approved']);
 
-        return redirect()->route('home')->with('success', 'Компаньйон підтверджений.');
+        return redirect()->route('home')->with('success', 'Компаньйон підтверджений!');
     }
+
 }

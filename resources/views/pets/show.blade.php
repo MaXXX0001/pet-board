@@ -8,40 +8,38 @@
         </div>
     @endif
 
-
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="row">
                     <div class="col-md-6">
-                        <img src="{{ asset('storage/' . $pet->image_path) }}" class="img-fluid" alt="{{ $pet->name }}">
+                        <img src="{{ asset($pet->images->firstWhere('size', '1200x630')->path) }}" class="img-fluid" alt="{{ $pet->name }}">
                     </div>
                     <div class="col-md-6">
                         <h2>{{ $pet->name }}</h2>
                         <p><strong>Порода:</strong> {{ $pet->breed }}</p>
                         <p><strong>Опис:</strong> {{ $pet->description }}</p>
-                        <p><strong>Власник:</strong> {{ $pet->owner->name }}</p>
+                        <p><strong>Власник:</strong> {{ optional($pet->owner)->name }}</p>
 
                         @if($pet && (optional(auth()->user())->isAdmin() || (isset($pet) && auth()->user() && auth()->user()->id === $pet->author_id)))
 
                             @if(!$pet->isApproved())
-                                <x-form action="{{ route('pets.approve', $pet->id) }}" method="post">
+                                <x-form action="{{ route('pets.approve', $pet->getKey()) }}" method="post">
                                     @method('put')
                                     @csrf
                                     <button class="btn btn-success mt-2" type="submit">Прийняти</button>
                                 </x-form>
                             @endif
 
-                            <form id="delete-form" action="{{ route('pets.destroy', ['pets' => $pet->id]) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-danger mt-2" type="submit" onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
-                                    Видалити
-                                </button>
-                            </form>
+                                <x-form id="delete-form" action="{{ route('pets.destroy', $pet->getKey()) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger mt-2" type="submit">
+                                        Видалити
+                                    </button>
+                                </x-form>
 
-                            <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-warning mt-2">Редагувати</a>
-
+                                <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-warning mt-2">Редагувати</a>
                         @endif
 
                     </div>
@@ -49,8 +47,6 @@
             </div>
         </div>
     </div>
-
-
 
     <div class="container mt-3">
 
@@ -82,15 +78,14 @@
                                     <p class="text-muted">Автор: {{ $comment->user->name }}</p>
 
                                     @if(optional(auth()->user())->isAdmin() || optional(auth()->user())->id === $comment->user_id)
-                                        <a href="{{ route('comment.destroy', ['comment' => $comment->id]) }}" onclick="event.preventDefault(); document.getElementById('delete-form-{{ $comment->id }}').submit();">
-                                            Видалити
-                                        </a>
-
-                                        <form id="delete-comment-form-{{ $comment->id }}" action="{{ route('comment.destroy', ['comment' => $comment->id]) }}" method="POST" style="display: none;">
+                                        <form action="{{ route('comment.destroy', ['comment' => $comment->id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
+
+                                            <button type="submit" class="btn btn-danger">Видалити</button>
                                         </form>
                                     @endif
+
                                 </div>
                             </div>
                         @endforeach
@@ -106,29 +101,5 @@
 
     </div>
 
-
 @endsection
 
-
-{{--@if($pet && (optional(auth()->user())->isAdmin() || (isset($pet) && auth()->user() && auth()->user()->id === $pet->author_id)))--}}
-
-{{--    @if(!$pet->isApproved())--}}
-{{--        <x-form action="{{ route('pets.approve', $pet->id) }}" method="post">--}}
-{{--            @method('put')--}}
-{{--            @csrf--}}
-{{--            <button class="btn btn-success mt-2" type="submit">Прийняти</button>--}}
-{{--        </x-form>--}}
-{{--    @endif--}}
-
-{{--    <a class="btn btn-danger mt-2" href="{{ route('pet.destroy', ['pets' => $pet->id]) }}" onclick="event.preventDefault(); document.getElementById('delete-form').submit();">--}}
-{{--        Видалити--}}
-{{--    </a>--}}
-
-{{--    <form id="delete-form" action="{{ route('pet.destroy', ['pets' => $pet->id]) }}" method="POST" style="display: none;">--}}
-{{--        @csrf--}}
-{{--        @method('DELETE')--}}
-{{--    </form>--}}
-
-{{--    <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-warning mt-2">Редагувати</a>--}}
-
-{{--@endif--}}

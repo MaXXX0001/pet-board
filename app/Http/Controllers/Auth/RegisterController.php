@@ -3,31 +3,36 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\RegisterRequest;
 
 class RegisterController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Retrieve the index view for the registration page.
+     *
+     * @return View The index view.
      */
-    public function index()
+    public function index(): View
     {
         return view('register.index');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @param RegisterRequest $request
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+
+    /**
+     * Store a new user in the database.
+     *
+     * @param RegisterRequest $request The request object containing the registration data.
+     * @return RedirectResponse The redirect response to the home route with a success message.
+     */
+    public function store(RegisterRequest $request): RedirectResponse
     {
-
-            $request->validate([
-                'name' => 'required|unique:users|string|max:50',
-                'email' => 'required|email|max:255|unique:users',
-                'password' => 'required|string|min:8',
-            ]);
-
             $user = User::create([
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),

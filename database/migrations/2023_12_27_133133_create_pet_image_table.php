@@ -11,20 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ratings', function (Blueprint $table) {
+        Schema::create('pet_images', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('pet_id');
 
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('pets_id');
-
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('pets_id')->references('id')->on('pets');
-
-            $table->integer('rating');
+            $table->string('size');
+            $table->string('path');
 
             $table->timestamps();
 
-
+            $table->foreign('pet_id')->references('id')->on('pets')->onDelete('cascade');
         });
     }
 
@@ -33,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ratings');
+        Schema::dropIfExists('pet_image');
     }
 };

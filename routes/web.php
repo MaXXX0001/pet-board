@@ -19,10 +19,6 @@ use App\Http\Controllers\CommentController;
 
 Route::get('/', [PetController::class, 'index'])->name('home');
 
-
-
-
-
 Route::middleware('guest')->group(function () {
 
     Route::get('register', [RegisterController::class, 'index'])->name('register');
@@ -30,8 +26,6 @@ Route::middleware('guest')->group(function () {
 
     Route::get('login', [LoginController::class, 'index'])->name('login');
     Route::post('login', [LoginController::class, 'store'])->name('login.store');
-
-
 
     });
 
@@ -41,16 +35,17 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::prefix('pets')->group(function () {
+    Route::get('create', [PetController::class, 'create'])->name('pets.create');
+    Route::post('store', [PetController::class, 'store'])->name('pets.store');
+    Route::get('{pet}', [PetController::class, 'show'])->name('pets.show');
+    Route::put('{pet}', [PetController::class, 'approve'])->name('pets.approve');
+    Route::get('{pet}/edit', [PetController::class, 'edit'])->name('pets.edit');
+    Route::put('{pet}/edit', [PetController::class, 'update'])->name('pets.update');
+    Route::delete('{pet}', [PetController::class, 'destroy'])->name('pets.destroy');
+});
 
-Route::get('pets/create', [PetController::class, 'create'])->name('pets.create');
-Route::post('pets/store', [PetController::class, 'store'])->name('pets.store');
-Route::get('pets/{pets}', [PetController::class, 'show'])->name('pets.show');
-Route::put('pets/{pets}', [PetController::class, 'approve'])->name('pets.approve');
-Route::get('pets/{pets}/edit', [PetController::class, 'edit'])->name('pets.edit');
-Route::put('pets/{pets}/edit', [PetController::class, 'update'])->name('pets.update');
-Route::delete('pets/{pets}', [PetController::class, 'destroy'])->name('pets.destroy');
-
-Route::post('/comments', [CommentController::class, 'store'])->name('comment.store');
-Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
-
-
+Route::prefix('comments')->group(function () {
+    Route::post('/', [CommentController::class, 'store'])->name('comment.store');
+    Route::delete('{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
+});

@@ -3,23 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
-use App\Models\Pet;
-use Illuminate\Http\Request;
+use App\Http\Requests\CommentRequest;
+use Illuminate\Http\RedirectResponse;
 
 class CommentController extends Controller
 {
-    public function create(Pet $pet)
+    /**
+     * Store a new comment.
+     *
+     * @param CommentRequest $request The comment request object that contains the comment details.
+     *
+     * @return RedirectResponse A redirect response to the previous page with a success message.
+     */
+    public function store(CommentRequest $request): RedirectResponse
     {
-
-    }
-
-    public function store(Request $request, Pet $pet)
-    {
-        $request->validate([
-            'comment' => 'required|max:255',
-            'pets_id' => 'required|integer',
-        ]);
-
         $comment = new Comment([
             'comment' => $request->input('comment'),
             'user_id' => auth()->id(),
@@ -29,15 +26,15 @@ class CommentController extends Controller
         $comment->save();
 
         return redirect()->back()->with('success', 'Коментар доданий успішно!');
-
     }
 
-    public function update()
-    {
-
-    }
-
-    public function destroy(Comment $comment)
+    /**
+     * Destroy a comment.
+     *
+     * @param Comment $comment The comment to be destroyed.
+     * @return RedirectResponse Redirects back to the previous page with a success or error message.
+     */
+    public function destroy(Comment $comment): RedirectResponse
     {
         $user = auth()->user();
         if ($user->isAdmin() || $user->id === $comment->user_id) {
@@ -49,5 +46,3 @@ class CommentController extends Controller
         }
     }
 }
-
-

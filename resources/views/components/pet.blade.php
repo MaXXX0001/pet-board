@@ -2,7 +2,7 @@
     <div class="card{{ !$pet->isApproved() ? ' not-approved' : '' }}" style="width: 22rem;">
 
         <div class="img-container">
-            <img src="{{ asset('storage/' . $pet->image_path) }}" class="card-img-top img-fluid" alt="{{ $pet->name }}">
+            <img src="{{ asset($pet->images->firstWhere('size', '350x200')->path) }}" class="card-img-top img-fluid" alt="{{ $pet->name }}">
         </div>
 
         <div class="card-body">

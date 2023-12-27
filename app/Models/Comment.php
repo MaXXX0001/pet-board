@@ -2,25 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Comment extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['comment', 'user_id', 'pets_id'];
 
-
-
-    public function user()
+    /**
+     * Get the user associated with the model.
+     *
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    public function pet()
+
+    /**
+     * Returns the relationship between the current object and the Pet model.
+     *
+     * @return BelongsTo
+     */
+    public function pet(): BelongsTo
     {
         return $this->belongsTo(Pet::class, 'pets_id');
     }
-
-
 }

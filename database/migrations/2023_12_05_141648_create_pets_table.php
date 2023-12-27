@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('pets', function (Blueprint $table) {
             $table->id();
+
             $table->string('name');
             $table->text('description');
             $table->string('breed');
             $table->unsignedBigInteger('author_id');
+
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->string('image_path');
+
             $table->foreign('author_id')->references('id')->on('users')->cascadeOnDelete();
+
             $table->timestamps();
         });
     }
