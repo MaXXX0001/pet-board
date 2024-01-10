@@ -66,13 +66,15 @@ class Pet extends Model implements HasImage
     /**
      * Updates the image of the given model with the provided uploaded file.
      *
-     * @param UploadedFile $image The image file to update.
+     * @param UploadedFile|null $image The image file to update.
      * @return void
      */
-    public function updateImage(UploadedFile $image): void
+    public function updateImage(?UploadedFile $image): void
     {
-        $imageService = app(ImageService::class);
-        $imageService->updateImage($this, $image);
+        if ($image) {
+            $imageService = app(ImageService::class);
+            $imageService->updateImage($this, $image);
+        }
     }
 
     /**

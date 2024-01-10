@@ -2,29 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PetFilterRequest;
 use App\Http\Requests\PetRequest;
 use App\Models\Pet;
-use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use App\Services\PetFilterService;
 
 class PetController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param PetFilterRequest $request
+     * @param PetFilterService $filterService
      * @return View
      */
-    public function index(): View
+    public function index(PetFilterRequest $request, PetFilterService $filterService): View
     {
-        $user = auth()->user();
+        $query = $request->user() && $request->user()->isAdmin()
+            ? Pet::query()
+            : Pet::where('status', 'approved');
 
-        if ($user && $user->isAdmin()) {
-            $pets = Pet::all();
-        } else {
-            $pets = Pet::where('status', 'approved')->get();
-        }
+        $query = $filterService->applyFilters($request, $query);
 
-        return view('welcome', compact('pets'));
+        $pets = $query->paginate(12);
+
+        return view('welcome', compact('pets', 'request'));
     }
 
     /**
@@ -94,7 +98,6 @@ class PetController extends Controller
             'name' => $request->input('name'),
             'breed' => $request->input('breed'),
             'description' => $request->input('description'),
-            'image_path' => $request->file('image')->store('', 'public'),
         ]);
 
         $pet->updateImage($request->file('image'));
