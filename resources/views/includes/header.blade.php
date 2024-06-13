@@ -44,7 +44,7 @@
                     @auth()
                 <div class="">
 
-                    <a  class="btn btn-outline-primary">
+                    <a  class="btn btn-outline-primary" href="{{  auth()->user() ? route('profile.index') : '#' }}">
                         {{ auth()->user()->name ?? 'Гість' }}
                     </a>
 

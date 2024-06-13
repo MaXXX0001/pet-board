@@ -13,6 +13,8 @@ use Intervention\Image\EncodedImage;
 
 class Pet extends Model implements HasImage
 {
+
+    protected $table = 'pets';
     protected $fillable = ['name', 'description', 'breed', 'status', 'author_id'];
 
     /**

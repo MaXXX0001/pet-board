@@ -49,7 +49,12 @@ class User extends Authenticatable
      */
     public function pet(): HasMany
     {
-        return $this->hasMany(Pet::class);
+        return $this->hasMany(Pet::class, 'author_id');
+    }
+
+    public function getPets()
+    {
+        return $this->pet()->get();
     }
 
     /**

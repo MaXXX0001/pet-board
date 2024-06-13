@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\PetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,13 +36,17 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::middleware('auth')->prefix('profile')->group(function () {
+    Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+});
+
 Route::prefix('pets')->group(function () {
     Route::get('create', [PetController::class, 'create'])->name('pets.create');
     Route::post('store', [PetController::class, 'store'])->name('pets.store');
     Route::get('{pet}', [PetController::class, 'show'])->name('pets.show');
     Route::put('{pet}', [PetController::class, 'approve'])->name('pets.approve');
     Route::get('{pet}/edit', [PetController::class, 'edit'])->name('pets.edit');
-    Route::put('{pet}/edit', [PetController::class, 'update'])->name('pets.update');
+    Route::put('{pet}   /edit', [PetController::class, 'update'])->name('pets.update');
     Route::delete('{pet}', [PetController::class, 'destroy'])->name('pets.destroy');
 });
 
